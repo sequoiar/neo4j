@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -48,6 +48,7 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
+import org.jboss.netty.channel.WriteCompletionEvent;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
@@ -112,6 +113,8 @@ public class NetworkSender
 
     private Map<URI, Channel> connections = new ConcurrentHashMap<URI, Channel>();
     private Iterable<NetworkChannelsListener> listeners = Listeners.newListeners();
+
+    private volatile boolean paused;
 
     public NetworkSender( Monitor monitor, Configuration config, NetworkReceiver receiver, Logging logging )
     {
@@ -207,6 +210,11 @@ public class NetworkSender
     @Override
     public boolean process( Message<? extends MessageType> message )
     {
+        if ( paused )
+        {
+            return true;
+        }
+
         if ( message.hasHeader( Message.TO ) )
         {
             send( message );
@@ -217,6 +225,11 @@ public class NetworkSender
             receiver.receive( message );
         }
         return true;
+    }
+
+    public void setPaused( boolean paused )
+    {
+        this.paused = paused;
     }
 
 
@@ -294,7 +307,7 @@ public class NetworkSender
                 }
                 catch ( Exception e )
                 {
-                    if( Exceptions.contains(e, ClosedChannelException.class ))
+                    if ( Exceptions.contains( e, ClosedChannelException.class ) )
                     {
                         msgLog.warn( "Could not send message, because the connection has been closed." );
                     }
@@ -418,6 +431,8 @@ public class NetworkSender
     private class NetworkMessageSender
             extends SimpleChannelHandler
     {
+        private Throwable lastException;
+
         @Override
         public void channelConnected( ChannelHandlerContext ctx, ChannelStateEvent e ) throws Exception
         {
@@ -447,8 +462,24 @@ public class NetworkSender
             Throwable cause = e.getCause();
             if ( !(cause instanceof ConnectException || cause instanceof RejectedExecutionException) )
             {
-                msgLog.error( "Receive exception:", cause );
+                // If we keep getting the same exception, only output the first one
+                if ( lastException != null && !lastException.getClass().equals( cause.getClass() ) )
+                {
+                    msgLog.error( "Receive exception:", cause );
+                    lastException = cause;
+                }
             }
+        }
+
+        @Override
+        public void writeComplete( ChannelHandlerContext ctx, WriteCompletionEvent e ) throws Exception
+        {
+            if ( lastException != null )
+            {
+                msgLog.error( "Recovered from:", lastException );
+                lastException = null;
+            }
+            super.writeComplete( ctx, e );
         }
     }
 }

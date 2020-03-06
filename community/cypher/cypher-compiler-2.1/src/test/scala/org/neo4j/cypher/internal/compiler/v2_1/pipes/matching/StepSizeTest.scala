@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -48,7 +48,7 @@ class StepSizeTest extends CypherFunSuite {
   }
 
   test("limited_varlength_plus_unlimited_is_none") {
-    val second = VarLengthStep(01, Seq(), Direction.OUTGOING, 0, None, None, True(), True())
+    val second = VarLengthStep(1, Seq(), Direction.OUTGOING, 0, None, None, True(), True())
     val step = VarLengthStep(0, Seq(), Direction.OUTGOING, 0, Some(42), Some(second), True(), True())
     step.size should equal(None)
   }

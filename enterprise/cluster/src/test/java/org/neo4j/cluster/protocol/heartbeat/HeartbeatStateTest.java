@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -72,7 +72,7 @@ public class HeartbeatStateTest
         HeartbeatContext heartbeatContext = context.getHeartbeatContext();
         Message received = Message.internal( HeartbeatMessage.suspicions,
                 new HeartbeatMessage.SuspicionsState( Iterables.toSet( Iterables.<InstanceId, InstanceId>iterable( instanceId ) ) ) );
-        received.setHeader( Message.FROM, "cluster://2" );
+        received.setHeader( Message.FROM, "cluster://2" ).setHeader( Message.INSTANCE_ID, "2" );
 
         // When
         heartbeat.handle( heartbeatContext, received, mock( MessageHolder.class) );
@@ -106,7 +106,7 @@ public class HeartbeatStateTest
         HeartbeatContext heartbeatContext = context.getHeartbeatContext();
         Message received = Message.internal( HeartbeatMessage.suspicions,
                 new HeartbeatMessage.SuspicionsState( Iterables.toSet( Iterables.<InstanceId, InstanceId>iterable( myId, foreignId ) ) ) );
-        received.setHeader( Message.FROM, "cluster://2" );
+        received.setHeader( Message.FROM, "cluster://2" ).setHeader( Message.INSTANCE_ID, "2" );
 
         // When
         heartbeat.handle( heartbeatContext, received, mock( MessageHolder.class) );

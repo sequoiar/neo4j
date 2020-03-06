@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -128,9 +128,10 @@ object IndexSeekStrategy extends NodeStrategy {
       labelPredicate <- labelPredicates;
       propertyPredicate <- propertyPredicates if ctx.getIndexRule(labelPredicate.solution, propertyPredicate.solution).nonEmpty
     ) yield {
-      val schemaIndex = SchemaIndex(node, labelPredicate.solution, propertyPredicate.solution, AnyIndex, None)
       val optConstraint = ctx.getUniquenessConstraint(labelPredicate.solution, propertyPredicate.solution)
       val rating = if (optConstraint.isDefined) Single else IndexEquality
+      val indexType = if (optConstraint.isDefined) UniqueIndex else AnyIndex
+      val schemaIndex = SchemaIndex(node, labelPredicate.solution, propertyPredicate.solution, indexType, None)
       val predicates = Seq.empty // These are still not solved.
       RatedStartItem(schemaIndex, rating, predicates)
     }

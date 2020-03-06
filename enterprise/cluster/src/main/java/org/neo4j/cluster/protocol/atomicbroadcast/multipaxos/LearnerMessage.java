@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -22,6 +22,9 @@ package org.neo4j.cluster.protocol.atomicbroadcast.multipaxos;
 import java.io.Serializable;
 
 import org.neo4j.cluster.com.message.MessageType;
+import org.neo4j.cluster.protocol.atomicbroadcast.AtomicBroadcastSerializer;
+import org.neo4j.cluster.protocol.atomicbroadcast.ObjectStreamFactory;
+import org.neo4j.cluster.protocol.atomicbroadcast.Payload;
 
 /**
  * Learner state machine messages
@@ -50,6 +53,19 @@ public enum LearnerMessage
         @Override
         public String toString()
         {
+            if ( value instanceof Payload )
+            {
+                try
+                {
+                    ObjectStreamFactory streamFactory = new ObjectStreamFactory();
+                    return new AtomicBroadcastSerializer( streamFactory, streamFactory ).receive(
+                            (Payload) value ).toString();
+                }
+                catch ( Throwable e )
+                {
+                    // Ignore
+                }
+            }
             return value.toString();
         }
 
@@ -92,7 +108,7 @@ public enum LearnerMessage
         @Override
         public boolean equals( Object obj )
         {
-            if(obj == null)
+            if ( obj == null )
             {
                 return false;
             }

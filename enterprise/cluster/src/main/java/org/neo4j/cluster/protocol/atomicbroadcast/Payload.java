@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -23,6 +23,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Arrays;
 
 /**
  * AtomicBroadcast payload. Wraps a byte buffer and its length.
@@ -71,5 +72,39 @@ public class Payload
         len = in.read();
         buf = new byte[len];
         in.read( buf, 0, len );
+    }
+
+    @Override
+    public boolean equals( Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        Payload payload = (Payload) o;
+
+        if ( len != payload.len )
+        {
+            return false;
+        }
+        if ( !Arrays.equals( buf, payload.buf ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = buf != null ? Arrays.hashCode( buf ) : 0;
+        result = 31 * result + len;
+        return result;
     }
 }

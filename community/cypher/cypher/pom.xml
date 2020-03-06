@@ -3,20 +3,20 @@
   <parent>
     <groupId>org.neo4j</groupId>
     <artifactId>cypher-parent</artifactId>
-    <version>2.1.8</version>
+    <version>2.1.9-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>neo4j-cypher</artifactId>
   <packaging>jar</packaging>
-  <version>2.1.8</version>
+  <version>2.1.9-SNAPSHOT</version>
   <name>Neo4j - Cypher</name>
   <description>Neo4j query language</description>
   <url>http://components.neo4j.org/${project.artifactId}/${project.version}</url>
 
   <scm>
-	  <url>https://github.com/neo4j/neo4j/tree/master/community/cypher</url>
+    <url>https://github.com/neo4j/neo4j/tree/master/community/cypher</url>
   </scm>
 
   <licenses>
@@ -38,7 +38,7 @@
       </comments>
     </license>
   </licenses>
-  
+
   <properties>
     <version-package>cypher.internal</version-package>
   </properties>

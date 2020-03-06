@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -155,6 +155,13 @@ As with nodes, the name of the relationship can always be omitted, in this case 
 +`(a)-[:REL_TYPE]->(b)`+
 
 === Variable length ===
+
+[CAUTION]
+Variable length pattern matching in versions 2.1.x and earlier does not enforce relationship uniqueness for patterns described inside of a single `MATCH` clause.
+This means that a query such as the following: `MATCH (a)-[r]->(b), (a)-[rs*]->(c) RETURN *` may include `r` as part of the `rs` set.
+This behavior has changed in versions 2.2.0 and later, in such a way that `r` will be excluded from the result set, as this better adheres to the rules of relationship uniqueness as documented here <<cypherdoc-uniqueness>>.
+If you have a query pattern that needs to retrace relationships rather than ignoring them as the relationship uniqueness rules normally dictate, you can accomplish this using multiple match clauses, as follows: `MATCH (a)-[r]->(b) MATCH (a)-[rs*]->(c) RETURN *`.
+This will work in all versions of Neo4j that support the `MATCH` clause, namely 2.0.0 and later.
 
 Rather than describing a long path using a sequence of many node and relationship descriptions in a pattern, many relationships (and the intermediate nodes) can be described by specifying a length in the relationship description of a pattern.
 For example:

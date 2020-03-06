@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -235,7 +235,20 @@ class NodeRecordCheck extends PrimitiveRecordCheck<NodeRecord, ConsistencyReport
                 {
                     engine.comparativeCheck( records.label( (int) labelId ), this );
                 }
-                sort( labelIds );
+                // This first loop, before sorting happens, verifies that labels are ordered like they are supposed to
+                boolean outOfOrder = false;
+                for ( int i = 1; i < labelIds.length; i++ )
+                {
+                    if ( labelIds[i -1] > labelIds[i])
+                    {
+                        engine.report().labelsOutOfOrder( labelIds[i-1], labelIds[i] );
+                        outOfOrder = true;
+                    }
+                }
+                if ( outOfOrder )
+                {
+                    sort( labelIds );
+                }
                 for ( int i = 1; i < labelIds.length; i++ )
                 {
                     if ( labelIds[i - 1] == labelIds[i] )

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -83,7 +83,9 @@ public enum ProposerState
                                     + " rejected from " + message.getHeader( Message.FROM ) + " with ballot "
                                     + rejectPropose.getBallot() );
 
-                            if ( instance.isState( PaxosInstance.State.p1_pending ) )
+                            if ( instance.isState( PaxosInstance.State.p1_pending ) &&
+                                    instance.getBallot() < rejectPropose.getBallot() ) // Ignore multiple rejects on
+                                    // same prepare
                             {
                                 long ballot = instance.ballot;
                                 while ( ballot <= rejectPropose.getBallot() )

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -71,6 +71,18 @@ class PathImplTest extends CypherFunSuite {
 
     badPaths.foreach(p => intercept[IllegalArgumentException](new PathImpl(p:_*)))
   }
+
+  test("retrieveLastRelationshipOnLongPath") {
+    val nodA = new FakeNode
+    val nodB = new FakeNode
+    val nodC = new FakeNode
+    val rel1 = new FakeRel(nodA, nodB, typ)
+    val rel2 = new FakeRel(nodB, nodC, typ)
+    val path = new PathImpl(nodA, rel1, nodB, rel2, nodC)
+
+    path.lastRelationship() should equal(rel2)
+  }
+
 
   class FakeRel(start: Node, end: Node, typ: RelationshipType) extends Relationship {
     def getId: Long = 0L

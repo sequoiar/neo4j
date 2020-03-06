@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -239,6 +239,10 @@ public interface ConsistencyReport
         /** The label token record is referenced twice from the same node. */
         @Documented
         void labelDuplicate( long labelId );
+
+        /** The label id array is not ordered */
+        @Documented
+        void labelsOutOfOrder( long largest, long smallest );
 
         /** The dynamic label record is not in use. */
         @Documented

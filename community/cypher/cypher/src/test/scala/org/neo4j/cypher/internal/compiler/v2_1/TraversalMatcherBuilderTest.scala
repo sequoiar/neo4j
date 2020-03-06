@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -118,6 +118,22 @@ class TraversalMatcherBuilderTest extends GraphDatabaseFunSuite with BuilderTest
 
   private def assertAcceptsQuery(q:PartiallySolvedQuery) {
     assertTrue("Should be able to build on this", builder.canWorkWith(plan(NullPipe(), q), ctx))
+  }
+
+  test("should handle starting from node and relationship") {
+    val q = query("start a=node(0), ab=relationship(0) match (a)-[ab]->(b) return b")
+    builder.canWorkWith(plan(NullPipe(), q), ctx) should be(true)
+
+    val newPlan = builder.apply(plan(NullPipe(), q), ctx)
+    newPlan.query.start.exists(_.unsolved) should be(false)
+  }
+
+  test("should handle starting from two nodes") {
+    val q = query("start a=node(0), b=node(1) match (a)-[ab]->(b) return b")
+    builder.canWorkWith(plan(NullPipe(), q), ctx) should be(true)
+
+    val newPlan = builder.apply(plan(NullPipe(), q), ctx)
+    newPlan.query.start.exists(_.unsolved) should be(false)
   }
 
   def assertQueryHasNotSolvedPathExpressions(newPlan: ExecutionPlanInProgress) {

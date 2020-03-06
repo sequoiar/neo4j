@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -22,6 +22,9 @@ package org.neo4j.cluster.protocol.atomicbroadcast.multipaxos;
 import java.io.Serializable;
 
 import org.neo4j.cluster.com.message.MessageType;
+import org.neo4j.cluster.protocol.atomicbroadcast.AtomicBroadcastSerializer;
+import org.neo4j.cluster.protocol.atomicbroadcast.ObjectStreamFactory;
+import org.neo4j.cluster.protocol.atomicbroadcast.Payload;
 
 /**
  * Coordinator state machine messages
@@ -61,9 +64,23 @@ public enum ProposerMessage
         @Override
         public String toString()
         {
+            Object toStringValue = value;
+            if ( toStringValue instanceof Payload )
+            {
+                try
+                {
+                    toStringValue = new AtomicBroadcastSerializer( new ObjectStreamFactory(),
+                            new ObjectStreamFactory() ).receive( (Payload) toStringValue );
+                }
+                catch ( Throwable e )
+                {
+                    e.printStackTrace();
+                }
+            }
+
             return "PromiseState{" +
                     "ballot=" + ballot +
-                    ", value=" + value +
+                    ", value=" + toStringValue +
                     '}';
         }
 

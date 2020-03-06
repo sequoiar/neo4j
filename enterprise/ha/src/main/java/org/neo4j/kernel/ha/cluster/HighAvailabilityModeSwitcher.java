@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -221,11 +221,20 @@ public class HighAvailabilityModeSwitcher implements HighAvailabilityMemberListe
 
     private void stateChanged( HighAvailabilityMemberChangeEvent event ) throws ExecutionException, InterruptedException
     {
-        availableMasterId = event.getServerHaUri();
         if ( event.getNewState() == event.getOldState() )
         {
+            /*
+             * We get here if for example a new master becomes available while we are already switching. In that case
+             * we don't change state but we must update with the new availableMasterId, but only if it is not null.
+             */
+            if ( event.getServerHaUri() != null )
+            {
+                availableMasterId = event.getServerHaUri();
+            }
             return;
         }
+
+        availableMasterId = event.getServerHaUri();
 
         currentTargetState = event.getNewState();
         switch ( event.getNewState() )
@@ -376,6 +385,7 @@ public class HighAvailabilityModeSwitcher implements HighAvailabilityMemberListe
                     ClusterClient clusterClient = dependencyResolver.resolveDependency( ClusterClient.class );
                     try
                     {
+                        // TODO I doubt this actually works. Shuts down with no recovery or restart
                         clusterClient.leave();
                         clusterClient.stop();
                         haCommunicationLife.shutdown();
@@ -386,7 +396,6 @@ public class HighAvailabilityModeSwitcher implements HighAvailabilityMemberListe
                     }
 
                     modeSwitcherExecutor.schedule( this, 5, TimeUnit.SECONDS );
-                    throw e;
                 }
                 catch ( MismatchingStoreIdException | NoSuchLogVersionException e )
                 {

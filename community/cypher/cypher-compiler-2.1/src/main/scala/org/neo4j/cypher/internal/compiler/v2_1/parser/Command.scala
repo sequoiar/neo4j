@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -51,5 +51,5 @@ trait Command extends Parser
   }
 
   private def ConstraintSyntax = keyword("CONSTRAINT ON") ~~ "(" ~~ Identifier ~~ NodeLabel ~~ ")" ~~
-    optional(keyword("ASSERT")) ~~ PropertyExpression ~~ keyword("IS UNIQUE")
+    keyword("ASSERT") ~~ PropertyExpression ~~ keyword("IS UNIQUE")
 }

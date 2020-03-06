@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -181,6 +181,87 @@ class MatchAcceptanceTest extends ExecutionEngineFunSuite with QueryStatisticsTe
 
     val result = execute("start r=rel(0) match (a)-[r]-(b) optional match (b)-[r2]-(c) where r<>r2 return a,b,c")
     result.toList should equal(List(Map("a" -> a, "b" -> b, "c" -> c), Map("a" -> b, "b" -> a, "c" -> null)))
+  }
+
+  test("Should return unique relationship on rel-id") {
+    val a = createNode()
+    val b = createNode()
+    val c = createNode()
+    val ab = relate(a, b)
+    val ac = relate(a, c)
+    val result = execute(
+      """start a=node(0), ab=relationship(0)
+        |match (a)-[ab]->(b)
+        |return b
+      """.stripMargin)
+
+    result.toList should equal(List(Map("b" -> b)))
+  }
+
+  test("Should return unique node on node-id") {
+    val a = createNode()
+    val b = createNode()
+    val c = createNode()
+    val ab = relate(a, b)
+    val ac = relate(a, c)
+    val result = execute(
+      """start a=node(0), b=node(1)
+        |match (a)-[ab]->(b)
+        |return b
+      """.stripMargin)
+
+    result.toList should equal(List(Map("b" -> b)))
+  }
+
+  test("Should return unique relationship on multiple rel-id") {
+    val a = createNode()
+    val b = createNode()
+    val c = createNode()
+    val d = createNode()
+    val e = createNode()
+    val ab = relate(a, b)
+    val ac = relate(a, c)
+    val bd = relate(b, d)
+    val ce = relate(c, e)
+    val result = execute(
+      """start a=node(0), ab=relationship(0), bd=relationship(2)
+        |match (a)-[ab]->(b)-[bd]->(d)
+        |return b, d
+      """.stripMargin)
+
+    result.toList should equal(List(Map("b" -> b, "d" -> d)))
+  }
+
+  test("Should return unique relationship on rel-ids") {
+    val a = createNode()
+    val b = createNode()
+    val c = createNode()
+    val d = createNode()
+    val ab = relate(a, b)
+    val ac = relate(a, c)
+    val ad = relate(a, d)
+    val result = execute(
+      """start a=node(0), ab=relationship(0, 1)
+        |match (a)-[ab]->(b)
+        |return b
+      """.stripMargin)
+
+    result.toList should equal(List(Map("b" -> b), Map("b" -> c)))
+  }
+
+  test("should return correct results on combined node and relationship index starts") {
+    val node = createNode()
+    val resultNode = createNode()
+    val rel = relate(node, resultNode)
+    relate(node, createNode())
+
+    graph.inTx {
+      graph.index.forNodes("nodes").add(node, "key", "A")
+      graph.index.forRelationships("rels").add(rel, "key", "B")
+    }
+
+    val result = execute("START n=node:nodes(key = 'A'), r=rel:rels(key = 'B') MATCH (n)-[r]->(b) RETURN b")
+    result.toList should equal(List(Map("b" -> resultNode)))
   }
 
   test("magic rel type works as expected") {

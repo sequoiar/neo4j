@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2015 "Neo Technology,"
+ * Copyright (c) 2002-2016 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -19,10 +19,12 @@
  */
 package org.neo4j.kernel;
 
+import org.neo4j.graphdb.TransientTransactionFailureException;
+
 /**
  * Signals that a deadlock between two or more transactions has been detected.
  */
-public class DeadlockDetectedException extends RuntimeException
+public class DeadlockDetectedException extends TransientTransactionFailureException
 {
     public DeadlockDetectedException( String message )
     {
