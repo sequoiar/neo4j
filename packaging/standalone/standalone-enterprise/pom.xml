@@ -88,18 +88,6 @@ terms of the relevant Commercial Agreement.
               </descriptors>
             </configuration>
           </execution>
-          <execution>
-            <id>enterprise-windows-dist</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>src/main/assemblies/enterprise-windows-dist.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>

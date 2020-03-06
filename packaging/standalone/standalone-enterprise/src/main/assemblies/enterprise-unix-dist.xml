@@ -141,7 +141,6 @@
         <exclude>commons-logging:*</exclude>
         <exclude>org.scala-lang:scala-library</exclude>
         <exclude>org.parboiled:*</exclude>
-        <exclude>org.neo4j.app:windows-service-wrapper:*</exclude>
         <exclude>com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru</exclude>
       </excludes>
     </dependencySet>
