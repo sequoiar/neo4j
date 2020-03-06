@@ -40,8 +40,6 @@
     <!-- other filter properties -->
     <wrapper.conf>conf/neo4j-wrapper.conf</wrapper.conf>
     <neo4j.version>${project.version}</neo4j.version>
-    <windows-wrapper.version>5</windows-wrapper.version>
-    <windows-wrapper.filename>windows-service-wrapper-${windows-wrapper.version}.jar</windows-wrapper.filename>
     
     <!-- conf/neo4j-server.properties filter properties -->
     <org.neo4j.database.location>data/graph.db</org.neo4j.database.location>
@@ -291,11 +289,6 @@ terms of the relevant Commercial Agreement.
   </repositories>
 
   <dependencies>
-    <dependency>
-      <groupId>org.neo4j.app</groupId>
-      <artifactId>windows-service-wrapper</artifactId>
-      <version>${windows-wrapper.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.neo4j.app</groupId>
       <artifactId>neo4j-server</artifactId>
