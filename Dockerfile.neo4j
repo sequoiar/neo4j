@@ -12,14 +12,12 @@ RUN \
  apt-get -y update && \
  apt-get install -y git tar maven
 
-# Add files
-COPY . /tmp/v2neo4j/
+# Add repo
+COPY . /tmp/
 
 # Building
 RUN \
-  cd /tmp && \
-  \
-  cd  v2neo4j/packaging/standalone && \
+  cd /tmp/packaging/standalone && \
   mvn clean package -Dlicense.skip -Dlicensing.skip && \
   \
   mkdir -p /appins && \
@@ -35,7 +33,7 @@ RUN \
  apt-get install -y openjdk-8-jre
 
 # Add files.
-COPY --from=0 /appins/*   /appins/
+COPY --from=0 /appins/*  /appins/
 COPY --from=0 /tmp/*tar* /tmp/
 
 # Set environment variables.
